@@ -409,8 +409,8 @@ export function loadLevel3(scene, obstacles, interactiveObjects) {
 
   // Level initial setup
   return {
-    spawnPosition: { x: 0, y: 0.1, z: -5.0 }, // Spawn in back center
-    spawnYaw: 0, // facing forward
+    spawnPosition: { x: -5.0, y: 0.1, z: -6.0 }, // Spawn in back-left corner (furthest from guard at x: 5.0, z: 5.0)
+    spawnYaw: Math.PI, // Facing forward down the room (+Z direction) directly towards the button pedestal
     playerHeight: 1.8,
     playerSpeed: 3.8,
     jumpForce: 7.5,
