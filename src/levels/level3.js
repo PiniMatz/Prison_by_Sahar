@@ -355,8 +355,11 @@ export function loadLevel3(scene, obstacles, interactiveObjects) {
   scene.add(lightTarget);
   flashLight.target = lightTarget;
 
-  // Track guard properties
-  let guardSpeed = 2.0;
+  // Detect touch device for difficulty balancing
+  const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+
+  // Track guard properties (slower on mobile touch screens)
+  let guardSpeed = isTouchDevice ? 1.3 : 2.0;
 
   // AI Update function
   const updateGuard = (player, dt, stateManager) => {
@@ -366,8 +369,9 @@ export function loadLevel3(scene, obstacles, interactiveObjects) {
     const dist2D = Math.sqrt(dx * dx + dz * dz);
 
     // Increase guard speed slowly over time to build pressure
-    guardSpeed += 0.04 * dt;
-    if (guardSpeed > 3.4) guardSpeed = 3.4; // cap speed
+    const maxGuardSpeed = isTouchDevice ? 2.2 : 3.4;
+    guardSpeed += (isTouchDevice ? 0.025 : 0.04) * dt;
+    if (guardSpeed > maxGuardSpeed) guardSpeed = maxGuardSpeed; // cap speed
 
     if (dist2D > 0.05) {
       const dirX = dx / dist2D;
