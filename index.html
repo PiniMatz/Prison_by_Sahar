@@ -50,9 +50,22 @@
             <span class="label">שלב</span>
             <span id="level-num" class="value">1</span>
           </div>
+          <!-- Player Health -->
+          <div id="player-health-hud" class="level-indicator health">
+            <span class="label">חיים</span>
+            <span id="player-hp" class="value" style="color: #ef4444; font-weight: 800;">100</span>
+          </div>
           <div class="objective-box">
             <span class="label">מטרה:</span>
             <span id="objective-text" class="value">טפס על המיטה והצינור כדי להגיע לפתח האוורור בתקרה, ולחץ E לפתיחה.</span>
+          </div>
+        </div>
+
+        <!-- Boss Health Bar (Hidden by default, shown in Level 4) -->
+        <div id="boss-health-bar" class="boss-health-bar">
+          <div class="boss-title">רובוט השוטר (BOSS)</div>
+          <div class="boss-hp-track">
+            <div id="boss-hp-fill" class="boss-hp-fill" style="width: 100%;"></div>
           </div>
         </div>
 

@@ -294,6 +294,59 @@ body, html {
   font-weight: 800;
 }
 
+/* Player Health Indicator */
+.level-indicator.health {
+  border-color: rgba(239, 68, 68, 0.3);
+  box-shadow: 0 10px 30px rgba(239, 68, 68, 0.15);
+}
+
+/* Boss Health Bar */
+.boss-health-bar {
+  display: none; /* Hidden by default, shown in level 4 */
+  width: 60%;
+  max-width: 600px;
+  align-self: center;
+  margin-top: 15px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 12px;
+  padding: 12px 20px;
+  box-shadow: 0 10px 35px rgba(239, 68, 68, 0.15);
+  text-align: center;
+  z-index: 60;
+}
+
+.boss-health-bar.active {
+  display: block;
+}
+
+.boss-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ef4444;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 8px;
+  text-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
+.boss-hp-track {
+  width: 100%;
+  height: 12px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.boss-hp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ef4444, #f97316);
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.8);
+  transition: width 0.15s ease-out;
+}
+
 /* Reticle / Crosshair */
 .reticle {
   position: absolute;

@@ -4,6 +4,7 @@ import { updatePlayerPhysics, getPlayerBox, checkOverlap } from './physics.js';
 import { loadLevel1 } from './levels/level1.js';
 import { loadLevel2 } from './levels/level2.js';
 import { loadLevel3 } from './levels/level3.js';
+import { loadLevel4 } from './levels/level4.js';
 
 // Game state variables
 let state = 'MENU'; // MENU, PLAYING, CAUGHT, WON
@@ -26,8 +27,16 @@ const player = {
   height: 1.8,
   speed: 3.5,
   jumpForce: 7.2,
-  keys: {}
+  keys: {},
+  hasGun: false, // equipped rifle state
+  hp: 100        // player hitpoints
 };
+window.playerObject = player; // expose for level4.js AI access
+
+// Combat and weapon entities
+const playerBullets = [];
+let gunViewModel = null;
+let recoilOffset = 0;
 
 // HTML UI Elements
 const uiStartMenu = document.getElementById('start-menu');
@@ -86,6 +95,11 @@ function initEngine() {
     prevMouseY = e.clientY;
     if (state === 'PLAYING') {
       canvas.requestPointerLock();
+      
+      // Fire gun on Left Click
+      if (e.button === 0) {
+        shootWeapon();
+      }
     }
   });
 
@@ -113,6 +127,10 @@ function initEngine() {
     // Clamp look tilt to prevent flipping (approx 82 degrees up/down)
     player.pitch = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, player.pitch));
   });
+
+  // Enable Viewmodel rendering (attach camera to scene and gun to camera)
+  scene.add(camera);
+  createGunViewModel();
 }
 
 function onWindowResize() {
@@ -166,9 +184,14 @@ const stateManager = {
     uiCaughtScreen.classList.add('active');
   },
   winGame: () => {
-    state = 'WON';
-    uiHud.classList.remove('active');
-    uiWinScreen.classList.add('active');
+    // If finished level 3, transition to the Boss Battle (Level 4)
+    if (currentLevelNum === 3) {
+      loadLevel(4);
+    } else {
+      state = 'WON';
+      uiHud.classList.remove('active');
+      uiWinScreen.classList.add('active');
+    }
   }
 };
 
@@ -177,7 +200,7 @@ function loadLevel(levelNum) {
   obstacles.length = 0;
   interactiveObjects.length = 0;
   ladders.length = 0;
-  
+
   // Hide overlays
   uiCaughtScreen.classList.remove('active');
   uiWinScreen.classList.remove('active');
@@ -187,17 +210,38 @@ function loadLevel(levelNum) {
   uiHud.classList.add('active');
   uiLevelNum.innerText = levelNum;
 
+  // Unload previous level data specific meshes
+  if (levelData && typeof levelData.unload === 'function') {
+    levelData.unload();
+  }
+
+  // Clear bullets
+  playerBullets.forEach(b => scene.remove(b.mesh));
+  playerBullets.length = 0;
+
+  // Reset player stats
+  player.hasGun = false;
+  player.hp = 100;
+  const hpDisplay = document.getElementById('player-hp');
+  if (hpDisplay) hpDisplay.innerText = 100;
+
+  // Hide boss health bar by default
+  const bossBar = document.getElementById('boss-health-bar');
+  if (bossBar) bossBar.classList.remove('active');
+
   // Load level specific geometry
   if (levelNum === 1) {
     levelData = loadLevel1(scene, obstacles, interactiveObjects);
     scene.fog.density = 0.08;
   } else if (levelNum === 2) {
     levelData = loadLevel2(scene, obstacles, interactiveObjects);
-    // Vents are dustier/foggy
     scene.fog.density = 0.15;
   } else if (levelNum === 3) {
     levelData = loadLevel3(scene, obstacles, interactiveObjects);
     scene.fog.density = 0.05;
+  } else if (levelNum === 4) {
+    levelData = loadLevel4(scene, obstacles, interactiveObjects);
+    scene.fog.density = 0.03;
   }
 
   // Position Player
@@ -231,6 +275,71 @@ function resetLevel(levelNum) {
 function restartGame() {
   uiWinScreen.classList.remove('active');
   loadLevel(1);
+}
+
+// Create the first-person gun viewmodel mesh
+function createGunViewModel() {
+  gunViewModel = new THREE.Group();
+
+  const gunMat = new THREE.MeshStandardMaterial({ 
+    color: 0x1f2937, 
+    roughness: 0.5, 
+    metalness: 0.8 
+  });
+
+  // Barrel
+  const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.45, 8), gunMat);
+  barrel.rotation.x = Math.PI / 2;
+  barrel.position.set(0, 0, -0.2);
+  gunViewModel.add(barrel);
+
+  // Body
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 0.2), gunMat);
+  body.position.set(0, -0.01, -0.05);
+  gunViewModel.add(body);
+
+  // Scope
+  const scope = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.12, 8), gunMat);
+  scope.rotation.x = Math.PI / 2;
+  scope.position.set(0, 0.035, -0.1);
+  gunViewModel.add(scope);
+
+  // Position at bottom-right corner of camera frame
+  gunViewModel.position.set(0.18, -0.15, -0.4);
+  gunViewModel.visible = false;
+  camera.add(gunViewModel);
+}
+
+// Shoot a neon laser bullet
+function shootWeapon() {
+  if (state !== 'PLAYING' || !player.hasGun) return;
+
+  const bulletGeo = new THREE.SphereGeometry(0.04, 6, 6);
+  const bulletMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+  const bulletMesh = new THREE.Mesh(bulletGeo, bulletMat);
+
+  // Start bullet at camera position
+  bulletMesh.position.copy(camera.position);
+
+  // Move bullet slightly forward and right relative to camera so it emerges from barrel
+  const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion).normalize();
+  const right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion).normalize();
+
+  bulletMesh.position.addScaledVector(right, 0.18);
+  bulletMesh.position.addScaledVector(forward, 0.45);
+  bulletMesh.position.y -= 0.15; // match gun muzzle height
+
+  scene.add(bulletMesh);
+
+  playerBullets.push({
+    mesh: bulletMesh,
+    dir: forward,
+    speed: 28.0, // fast projectile
+    lifetime: 2.0
+  });
+
+  // Snappy recoil kickback
+  recoilOffset = 0.08;
 }
 
 // Process E interaction press
@@ -282,6 +391,41 @@ function gameLoop(time) {
   if (state === 'PLAYING') {
     // 1. Update Player position and physics collisions
     updatePlayerPhysics(player, dt, obstacles, ladders);
+
+    // Update gun viewmodel animation
+    if (player.hasGun && gunViewModel) {
+      gunViewModel.visible = true;
+      recoilOffset += (0 - recoilOffset) * 12 * dt; // Snappy return to center
+      gunViewModel.position.set(0.18, -0.15, -0.4 + recoilOffset);
+    } else if (gunViewModel) {
+      gunViewModel.visible = false;
+    }
+
+    // Update player bullets
+    for (let i = playerBullets.length - 1; i >= 0; i--) {
+      const bullet = playerBullets[i];
+      bullet.mesh.position.addScaledVector(bullet.dir, bullet.speed * dt);
+      bullet.lifetime -= dt;
+
+      // Check hit on Boss (only in level 4)
+      if (currentLevelNum === 4 && levelData && typeof levelData.getBossAABB === 'function') {
+        const bossAABB = levelData.getBossAABB();
+        const bulletBox = getPlayerBox(bullet.mesh.position, 0.1, 0.1);
+        
+        if (checkOverlap(bulletBox, bossAABB)) {
+          levelData.takeDamage(10, stateManager); // Boss takes 10 damage
+          scene.remove(bullet.mesh);
+          playerBullets.splice(i, 1);
+          continue;
+        }
+      }
+
+      // Clean up old bullets
+      if (bullet.lifetime <= 0) {
+        scene.remove(bullet.mesh);
+        playerBullets.splice(i, 1);
+      }
+    }
 
     // 2. Align Camera at eye height
     camera.position.set(
