@@ -20,6 +20,7 @@ const ladders = [];
 const player = {
   position: new THREE.Vector3(0, 0, 0),
   yaw: 0,
+  pitch: 0, // Vertical look tilt angle
   velocityY: 0,
   isGrounded: false,
   height: 1.8,
@@ -73,6 +74,45 @@ function initEngine() {
   btnStart.addEventListener('click', startGame);
   btnRetry.addEventListener('click', () => resetLevel(currentLevelNum));
   btnRestart.addEventListener('click', restartGame);
+
+  // Mouse look with Pointer Lock and click-drag fallback
+  let isMouseDown = false;
+  let prevMouseX = 0;
+  let prevMouseY = 0;
+
+  canvas.addEventListener('mousedown', (e) => {
+    isMouseDown = true;
+    prevMouseX = e.clientX;
+    prevMouseY = e.clientY;
+    if (state === 'PLAYING') {
+      canvas.requestPointerLock();
+    }
+  });
+
+  window.addEventListener('mouseup', () => {
+    isMouseDown = false;
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (state !== 'PLAYING') return;
+
+    const sensitivity = 0.0025;
+
+    if (document.pointerLockElement === canvas) {
+      player.yaw -= e.movementX * sensitivity;
+      player.pitch -= e.movementY * sensitivity;
+    } else if (isMouseDown) {
+      const deltaX = e.clientX - prevMouseX;
+      const deltaY = e.clientY - prevMouseY;
+      player.yaw -= deltaX * sensitivity;
+      player.pitch -= deltaY * sensitivity;
+      prevMouseX = e.clientX;
+      prevMouseY = e.clientY;
+    }
+
+    // Clamp look tilt to prevent flipping (approx 82 degrees up/down)
+    player.pitch = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, player.pitch));
+  });
 }
 
 function onWindowResize() {
@@ -167,6 +207,7 @@ function loadLevel(levelNum) {
     levelData.spawnPosition.z
   );
   player.yaw = levelData.spawnYaw;
+  player.pitch = 0; // reset vertical look tilt
   player.velocityY = 0;
   player.isGrounded = false;
   player.height = levelData.playerHeight;
@@ -249,8 +290,8 @@ function gameLoop(time) {
       player.position.z
     );
     
-    // Set yaw rotation (Left/Right)
-    camera.rotation.set(0, player.yaw, 0);
+    // Set yaw and pitch rotation (order YXZ ensures horizon stays flat)
+    camera.rotation.set(player.pitch, player.yaw, 0);
 
     // 3. Update level-specific AI (e.g. Guard chasing)
     if (levelData && typeof levelData.update === 'function') {

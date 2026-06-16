@@ -187,40 +187,61 @@ export function loadLevel1(scene, obstacles, interactiveObjects) {
   // Top Bed: X from -3.3 to -1.9, Z from -3.7 to -1.1, Y from 2.0 to 2.45
   obstacles.push(new AABB({ x: -3.3, y: 2.0, z: -3.7 }, { x: -1.9, y: 2.45, z: -1.1 }, 'bed_top'));
 
-  // 5. Water Pipe (Jumpable Parkour Object)
-  // Horizontal pipe along the back wall (Z = -3.8) at height Y = 3.7
-  const pipeLength = 6.0;
+  // 5. Water Pipe 1 (along back wall, Z = -3.75, Y = 3.3)
+  const pipe1Length = 6.0;
   const pipeRadius = 0.12;
-  const pipeGeo = new THREE.CylinderGeometry(pipeRadius, pipeRadius, pipeLength, 12);
-  const pipe = new THREE.Mesh(pipeGeo, pipeMaterial);
-  pipe.rotation.z = Math.PI / 2;
-  pipe.position.set(0.5, 3.7, -3.75); // Lowered from 4.3 to 3.7
-  pipe.castShadow = true;
-  pipe.receiveShadow = true;
-  scene.add(pipe);
+  const pipe1Geo = new THREE.CylinderGeometry(pipeRadius, pipeRadius, pipe1Length, 12);
+  const pipe1 = new THREE.Mesh(pipe1Geo, pipeMaterial);
+  pipe1.rotation.z = Math.PI / 2;
+  pipe1.position.set(0.5, 3.3, -3.75);
+  pipe1.castShadow = true;
+  pipe1.receiveShadow = true;
+  scene.add(pipe1);
 
-  // Vertical pipe connector leading down to floor
-  const vertPipeGeo = new THREE.CylinderGeometry(pipeRadius * 0.8, pipeRadius * 0.8, 3.7, 12);
-  const vertPipe = new THREE.Mesh(vertPipeGeo, pipeMaterial);
-  vertPipe.position.set(3.4, 1.85, -3.75);
-  vertPipe.castShadow = true;
-  scene.add(vertPipe);
+  // Vertical pipe connector for Pipe 1
+  const vertPipeGeo = new THREE.CylinderGeometry(pipeRadius * 0.8, pipeRadius * 0.8, 3.3, 12);
+  const vertPipe1 = new THREE.Mesh(vertPipeGeo, pipeMaterial);
+  vertPipe1.position.set(3.4, 1.65, -3.75);
+  vertPipe1.castShadow = true;
+  scene.add(vertPipe1);
 
-  // Pipe joints (small cylinders around the pipe for visual complexity)
+  // Pipe joints for Pipe 1
   const jointGeo = new THREE.CylinderGeometry(pipeRadius + 0.02, pipeRadius + 0.02, 0.15, 12);
   const joint1 = new THREE.Mesh(jointGeo, metalMaterial);
   joint1.rotation.z = Math.PI/2;
-  joint1.position.set(-1.5, 3.7, -3.75);
+  joint1.position.set(-1.5, 3.3, -3.75);
   scene.add(joint1);
 
   const joint2 = new THREE.Mesh(jointGeo, metalMaterial);
   joint2.rotation.z = Math.PI/2;
-  joint2.position.set(2.0, 3.7, -3.75);
+  joint2.position.set(2.0, 3.3, -3.75);
   scene.add(joint2);
 
-  // Add Pipe Physics Obstacle
-  // X from -2.5 to 3.5, Y from 3.55 to 3.85, Z from -3.9 to -3.6
-  obstacles.push(new AABB({ x: -2.5, y: 3.55, z: -3.9 }, { x: 3.5, y: 3.85, z: -3.6 }, 'water_pipe'));
+  obstacles.push(new AABB({ x: -2.5, y: 3.15, z: -3.9 }, { x: 3.5, y: 3.45, z: -3.6 }, 'water_pipe_1'));
+
+  // 5b. Water Pipe 2 (along left wall, X = -3.75, Y = 4.8)
+  const pipe2Length = 5.0;
+  const pipe2Geo = new THREE.CylinderGeometry(pipeRadius, pipeRadius, pipe2Length, 12);
+  const pipe2 = new THREE.Mesh(pipe2Geo, pipeMaterial);
+  pipe2.rotation.x = Math.PI / 2; // runs along Z axis
+  pipe2.position.set(-3.75, 4.8, -1.0);
+  pipe2.castShadow = true;
+  pipe2.receiveShadow = true;
+  scene.add(pipe2);
+
+  // Vertical pipe connector for Pipe 2
+  const vertPipe2 = new THREE.Mesh(new THREE.CylinderGeometry(pipeRadius * 0.8, pipeRadius * 0.8, 4.8, 12), pipeMaterial);
+  vertPipe2.position.set(-3.75, 2.4, 1.5);
+  vertPipe2.castShadow = true;
+  scene.add(vertPipe2);
+
+  // Joint for Pipe 2
+  const joint3 = new THREE.Mesh(jointGeo, metalMaterial);
+  joint3.rotation.x = Math.PI/2;
+  joint3.position.set(-3.75, 4.8, -2.5);
+  scene.add(joint3);
+
+  obstacles.push(new AABB({ x: -3.9, y: 4.65, z: -3.5 }, { x: -3.6, y: 4.95, z: 1.5 }, 'water_pipe_2'));
 
   // 6. Interactive Object: Ceiling Ventilation Grate
   const ventGrateTex = createGrateTexture();
