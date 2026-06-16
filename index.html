@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>הבריחה מהכלא - משחק תלת מימד</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <!-- Canvas for Three.js WebGL -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- UI Overlay container -->
+    <div id="ui-container">
+      
+      <!-- Start Menu -->
+      <div id="start-menu" class="overlay-screen active">
+        <div class="glass-card">
+          <h1 class="glow-text">הבריחה מהכלא</h1>
+          <h2 class="glow-text sub">Prison Escape 3D</h2>
+          <p class="description">
+            מטרתך היא לברוח מהכלא דרך 3 שלבים מאתגרים. השתמש בכישורי הפרקור ובתושייה שלך כדי לחמוק מהשוטר ולמצוא את דרכך לחופש!
+          </p>
+          
+          <div class="instructions-box">
+            <h3>הוראות ומקשים:</h3>
+            <ul>
+              <li><strong>חץ למעלה / למטה:</strong> הליכה קדימה / אחורה</li>
+              <li><strong>חץ ימינה / שמאלה:</strong> סיבוב המצלמה / כיוון ההליכה</li>
+              <li><strong>מקש רווח (Space):</strong> קפיצה</li>
+              <li><strong>מקש E:</strong> אינטראקציה (לחיצה על כפתורים, פתיחת פתחי אוורור)</li>
+            </ul>
+          </div>
+
+          <button id="start-btn" class="glow-btn">התחל משחק</button>
+        </div>
+      </div>
+
+      <!-- HUD (Heads-Up Display) -->
+      <div id="hud" class="hud-container">
+        <!-- Reticle -->
+        <div class="reticle"></div>
+
+        <!-- Top bar (Level and Objective) -->
+        <div class="top-hud">
+          <div class="level-indicator">
+            <span class="label">שלב</span>
+            <span id="level-num" class="value">1</span>
+          </div>
+          <div class="objective-box">
+            <span class="label">מטרה:</span>
+            <span id="objective-text" class="value">טפס על המיטה והצינור כדי להגיע לפתח האוורור בתקרה, ולחץ E לפתיחה.</span>
+          </div>
+        </div>
+
+        <!-- Interaction Prompt -->
+        <div id="interaction-prompt" class="interaction-prompt">
+          לחץ <span class="key-e">E</span> כדי לפתוח
+        </div>
+
+        <!-- Warning HUD (For Level 3 Guard Chase) -->
+        <div id="warning-hud" class="warning-hud">
+          <span class="warning-glow">השוטר רודף אחריך!</span>
+        </div>
+      </div>
+
+      <!-- Caught Screen (Game Over) -->
+      <div id="caught-screen" class="overlay-screen">
+        <div class="glass-card danger">
+          <h1 class="glow-text red">נתפסת!</h1>
+          <p class="description">
+            השוטר תפס אותך מנסה לברוח. אל תתייאש, נסה שוב!
+          </p>
+          <button id="retry-btn" class="glow-btn danger-btn">נסה שוב</button>
+        </div>
+      </div>
+
+      <!-- Win Screen -->
+      <div id="win-screen" class="overlay-screen">
+        <div class="glass-card success">
+          <h1 class="glow-text green">ברחת בהצלחה!</h1>
+          <p class="description">
+            עברת את תעלות האוורור, חמקת מהשוטר ויצאת לחופשי!
+          </p>
+          <button id="restart-btn" class="glow-btn success-btn">שחק שוב</button>
+        </div>
+      </div>
+
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
