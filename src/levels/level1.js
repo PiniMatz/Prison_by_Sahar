@@ -252,7 +252,7 @@ export function loadLevel1(scene, obstacles, interactiveObjects) {
   });
 
   const ventGroup = new THREE.Group();
-  ventGroup.position.set(0, height - 0.01, 0); // Flat on the ceiling
+  ventGroup.position.set(-3.3, height - 0.01, -2.0); // Repositioned directly above Pipe 2
 
   const grateGeo = new THREE.PlaneGeometry(1.4, 1.4);
   const grateMesh = new THREE.Mesh(grateGeo, ventMaterial);
@@ -265,8 +265,8 @@ export function loadLevel1(scene, obstacles, interactiveObjects) {
   // Add interactive object structure
   const interactiveVent = {
     mesh: ventGroup,
-    // Trigger zone: Player needs to stand on the pipe (which is at Y=3.7) or jump and be close to X=0, Z=0, Y > 5.0
-    trigger: new AABB({ x: -1.2, y: 4.5, z: -1.2 }, { x: 1.2, y: 7.2, z: 1.2 }, 'vent_trigger'),
+    // Trigger zone aligned above Pipe 2
+    trigger: new AABB({ x: -3.9, y: 4.5, z: -3.0 }, { x: -2.7, y: 7.2, z: -1.0 }, 'vent_trigger'),
     action: (stateManager) => {
       // Transition to Level 2
       stateManager.changeLevel(2);
