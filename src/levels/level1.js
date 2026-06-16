@@ -188,21 +188,21 @@ export function loadLevel1(scene, obstacles, interactiveObjects) {
   obstacles.push(new AABB({ x: -3.3, y: 2.0, z: -3.7 }, { x: -1.9, y: 2.45, z: -1.1 }, 'bed_top'));
 
   // 5. Water Pipe (Jumpable Parkour Object)
-  // Horizontal pipe along the back wall (Z = -3.8) at height Y = 4.3
+  // Horizontal pipe along the back wall (Z = -3.8) at height Y = 3.7
   const pipeLength = 6.0;
   const pipeRadius = 0.12;
   const pipeGeo = new THREE.CylinderGeometry(pipeRadius, pipeRadius, pipeLength, 12);
   const pipe = new THREE.Mesh(pipeGeo, pipeMaterial);
   pipe.rotation.z = Math.PI / 2;
-  pipe.position.set(0.5, 4.3, -3.75); // Centered, slightly offset from back wall
+  pipe.position.set(0.5, 3.7, -3.75); // Lowered from 4.3 to 3.7
   pipe.castShadow = true;
   pipe.receiveShadow = true;
   scene.add(pipe);
 
   // Vertical pipe connector leading down to floor
-  const vertPipeGeo = new THREE.CylinderGeometry(pipeRadius * 0.8, pipeRadius * 0.8, 4.3, 12);
+  const vertPipeGeo = new THREE.CylinderGeometry(pipeRadius * 0.8, pipeRadius * 0.8, 3.7, 12);
   const vertPipe = new THREE.Mesh(vertPipeGeo, pipeMaterial);
-  vertPipe.position.set(3.4, 2.15, -3.75);
+  vertPipe.position.set(3.4, 1.85, -3.75);
   vertPipe.castShadow = true;
   scene.add(vertPipe);
 
@@ -210,17 +210,17 @@ export function loadLevel1(scene, obstacles, interactiveObjects) {
   const jointGeo = new THREE.CylinderGeometry(pipeRadius + 0.02, pipeRadius + 0.02, 0.15, 12);
   const joint1 = new THREE.Mesh(jointGeo, metalMaterial);
   joint1.rotation.z = Math.PI/2;
-  joint1.position.set(-1.5, 4.3, -3.75);
+  joint1.position.set(-1.5, 3.7, -3.75);
   scene.add(joint1);
 
   const joint2 = new THREE.Mesh(jointGeo, metalMaterial);
   joint2.rotation.z = Math.PI/2;
-  joint2.position.set(2.0, 4.3, -3.75);
+  joint2.position.set(2.0, 3.7, -3.75);
   scene.add(joint2);
 
   // Add Pipe Physics Obstacle
-  // X from -2.5 to 3.5, Y from 4.18 to 4.42, Z from -3.9 to -3.6
-  obstacles.push(new AABB({ x: -2.5, y: 4.15, z: -3.9 }, { x: 3.5, y: 4.45, z: -3.6 }, 'water_pipe'));
+  // X from -2.5 to 3.5, Y from 3.55 to 3.85, Z from -3.9 to -3.6
+  obstacles.push(new AABB({ x: -2.5, y: 3.55, z: -3.9 }, { x: 3.5, y: 3.85, z: -3.6 }, 'water_pipe'));
 
   // 6. Interactive Object: Ceiling Ventilation Grate
   const ventGrateTex = createGrateTexture();
@@ -244,8 +244,8 @@ export function loadLevel1(scene, obstacles, interactiveObjects) {
   // Add interactive object structure
   const interactiveVent = {
     mesh: ventGroup,
-    // Trigger zone: Player needs to stand on the pipe (which is at Y=4.3) or jump and be close to X=0, Z=0, Y > 5.2
-    trigger: new AABB({ x: -1.2, y: 4.8, z: -1.2 }, { x: 1.2, y: 7.2, z: 1.2 }, 'vent_trigger'),
+    // Trigger zone: Player needs to stand on the pipe (which is at Y=3.7) or jump and be close to X=0, Z=0, Y > 5.0
+    trigger: new AABB({ x: -1.2, y: 4.5, z: -1.2 }, { x: 1.2, y: 7.2, z: 1.2 }, 'vent_trigger'),
     action: (stateManager) => {
       // Transition to Level 2
       stateManager.changeLevel(2);
@@ -255,8 +255,8 @@ export function loadLevel1(scene, obstacles, interactiveObjects) {
   interactiveObjects.push(interactiveVent);
 
   // 7. Lighting
-  // Ambient light for general dark visibility
-  const ambientLight = new THREE.AmbientLight(0x444d66, 0.75);
+  // Make the cell extremely bright with a white ambient light
+  const ambientLight = new THREE.AmbientLight(0xffffff, 1.8);
   scene.add(ambientLight);
 
   // Main cell hanging bulb (PointLight)
@@ -273,7 +273,7 @@ export function loadLevel1(scene, obstacles, interactiveObjects) {
   scene.add(wireMesh);
   scene.add(bulbMesh);
 
-  const cellLight = new THREE.PointLight(0xfff5e0, 3.2, 16);
+  const cellLight = new THREE.PointLight(0xfff5e0, 4.0, 18);
   cellLight.position.set(0, height - 0.6, 0);
   cellLight.castShadow = true;
   cellLight.shadow.mapSize.width = 1024;
@@ -282,7 +282,7 @@ export function loadLevel1(scene, obstacles, interactiveObjects) {
   scene.add(cellLight);
 
   // Moonlight coming through cell bars (directional light from side)
-  const moonLight = new THREE.DirectionalLight(0x5c7cfa, 1.2);
+  const moonLight = new THREE.DirectionalLight(0x5c7cfa, 1.5);
   moonLight.position.set(6, 4, 0);
   scene.add(moonLight);
 
@@ -306,8 +306,8 @@ export function loadLevel1(scene, obstacles, interactiveObjects) {
     spawnPosition: { x: 0, y: 0.1, z: 2.0 },
     spawnYaw: Math.PI, // Facing the bed/wall
     playerHeight: 1.8,
-    playerSpeed: 3.5,
-    jumpForce: 7.2,
+    playerSpeed: 4.0,
+    jumpForce: 8.5,
     objective: "טפס על המיטה והצינור כדי להגיע לפתח האוורור בתקרה, ולחץ E לפתיחה.",
     ladders: [
       new AABB({ x: -2.15, y: 0, z: -2.8 }, { x: -1.85, y: 2.4, z: -2.0 }, 'ladder_bunkbed')
