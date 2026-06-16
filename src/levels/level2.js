@@ -294,8 +294,8 @@ export function loadLevel2(scene, obstacles, interactiveObjects) {
   interactiveObjects.push(interactiveExit);
 
   // 9. Lighting
-  // Very dim ambient light for tunnel mood
-  const ambientLight = new THREE.AmbientLight(0x0c0f12, 0.3);
+  // Brighter ambient light for visibility
+  const ambientLight = new THREE.AmbientLight(0x445544, 0.65);
   scene.add(ambientLight);
 
   // Dim green emergency lights along the ceiling
@@ -326,7 +326,7 @@ export function loadLevel2(scene, obstacles, interactiveObjects) {
     scene.add(bulb);
 
     // Point Light
-    const pLight = new THREE.PointLight(lightColor, 0.8, 4.5);
+    const pLight = new THREE.PointLight(lightColor, 1.6, 6.0);
     pLight.position.set(lx, ductH - 0.1, lz);
     pLight.castShadow = true;
     pLight.shadow.bias = -0.002;

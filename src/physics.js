@@ -23,12 +23,36 @@ export function getPlayerBox(position, height, radius = 0.3) {
 }
 
 // Main physics update loop for character movement
-export function updatePlayerPhysics(player, dt, obstacles, gravity = 22) {
-  // Apply gravity
-  if (!player.isGrounded) {
-    player.velocityY -= gravity * dt;
-    // Terminal velocity to prevent falling through floor at extreme speeds
-    if (player.velocityY < -35) player.velocityY = -35;
+export function updatePlayerPhysics(player, dt, obstacles, ladders = [], gravity = 22) {
+  // Check if player is touching a ladder
+  let isOnLadder = false;
+  let playerBox = getPlayerBox(player.position, player.height);
+  for (const ladder of ladders) {
+    if (checkOverlap(playerBox, ladder)) {
+      isOnLadder = true;
+      break;
+    }
+  }
+
+  // Apply gravity or ladder climbing
+  if (isOnLadder) {
+    player.velocityY = 0;
+    player.isGrounded = true; // allow jumping off the ladder
+    
+    // Climb up/down using Up/Down arrows
+    if (player.keys['ArrowUp']) {
+      player.position.y += player.speed * 0.7 * dt;
+    }
+    if (player.keys['ArrowDown']) {
+      player.position.y -= player.speed * 0.7 * dt;
+    }
+  } else {
+    // Apply gravity
+    if (!player.isGrounded) {
+      player.velocityY -= gravity * dt;
+      // Terminal velocity to prevent falling through floor at extreme speeds
+      if (player.velocityY < -35) player.velocityY = -35;
+    }
   }
 
   // Calculate movement direction based on key inputs
@@ -67,7 +91,7 @@ export function updatePlayerPhysics(player, dt, obstacles, gravity = 22) {
   player.position.y += dy;
   player.isGrounded = false;
 
-  let playerBox = getPlayerBox(player.position, player.height);
+  playerBox = getPlayerBox(player.position, player.height);
 
   for (const obstacle of obstacles) {
     if (checkOverlap(playerBox, obstacle)) {

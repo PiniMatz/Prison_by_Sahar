@@ -246,8 +246,8 @@ export function loadLevel3(scene, obstacles, interactiveObjects) {
   interactiveObjects.push(interactiveExit);
 
   // 9. Lighting
-  // Ambient visibility
-  const ambient = new THREE.AmbientLight(0x111622, 0.4);
+  // Ambient visibility (Brighter)
+  const ambient = new THREE.AmbientLight(0x444f66, 0.8);
   scene.add(ambient);
 
   // Central prison fluorescent fixture
@@ -264,7 +264,7 @@ export function loadLevel3(scene, obstacles, interactiveObjects) {
   tube.position.set(0, height - 0.18, 0);
   scene.add(tube);
 
-  const roomLight = new THREE.PointLight(0xdbeafe, 1.4, 25);
+  const roomLight = new THREE.PointLight(0xdbeafe, 3.2, 30);
   roomLight.position.set(0, height - 0.3, 0);
   roomLight.castShadow = true;
   roomLight.shadow.mapSize.width = 1024;

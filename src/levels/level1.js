@@ -256,7 +256,7 @@ export function loadLevel1(scene, obstacles, interactiveObjects) {
 
   // 7. Lighting
   // Ambient light for general dark visibility
-  const ambientLight = new THREE.AmbientLight(0x1a2130, 0.4);
+  const ambientLight = new THREE.AmbientLight(0x444d66, 0.75);
   scene.add(ambientLight);
 
   // Main cell hanging bulb (PointLight)
@@ -273,7 +273,7 @@ export function loadLevel1(scene, obstacles, interactiveObjects) {
   scene.add(wireMesh);
   scene.add(bulbMesh);
 
-  const cellLight = new THREE.PointLight(0xfff5e0, 1.8, 12);
+  const cellLight = new THREE.PointLight(0xfff5e0, 3.2, 16);
   cellLight.position.set(0, height - 0.6, 0);
   cellLight.castShadow = true;
   cellLight.shadow.mapSize.width = 1024;
@@ -282,7 +282,7 @@ export function loadLevel1(scene, obstacles, interactiveObjects) {
   scene.add(cellLight);
 
   // Moonlight coming through cell bars (directional light from side)
-  const moonLight = new THREE.DirectionalLight(0x5c7cfa, 0.8);
+  const moonLight = new THREE.DirectionalLight(0x5c7cfa, 1.2);
   moonLight.position.set(6, 4, 0);
   scene.add(moonLight);
 
@@ -308,6 +308,9 @@ export function loadLevel1(scene, obstacles, interactiveObjects) {
     playerHeight: 1.8,
     playerSpeed: 3.5,
     jumpForce: 7.2,
-    objective: "טפס על המיטה והצינור כדי להגיע לפתח האוורור בתקרה, ולחץ E לפתיחה."
+    objective: "טפס על המיטה והצינור כדי להגיע לפתח האוורור בתקרה, ולחץ E לפתיחה.",
+    ladders: [
+      new AABB({ x: -2.15, y: 0, z: -2.8 }, { x: -1.85, y: 2.4, z: -2.0 }, 'ladder_bunkbed')
+    ]
   };
 }

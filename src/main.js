@@ -14,6 +14,7 @@ let levelData = null;
 let scene, camera, renderer;
 const obstacles = [];
 const interactiveObjects = [];
+const ladders = [];
 
 // Player representation
 const player = {
@@ -135,6 +136,7 @@ function loadLevel(levelNum) {
   currentLevelNum = levelNum;
   obstacles.length = 0;
   interactiveObjects.length = 0;
+  ladders.length = 0;
   
   // Hide overlays
   uiCaughtScreen.classList.remove('active');
@@ -173,6 +175,10 @@ function loadLevel(levelNum) {
 
   uiObjectiveText.innerText = levelData.objective;
   uiObjectiveText.style.color = '#fff'; // reset color
+
+  if (levelData && levelData.ladders) {
+    ladders.push(...levelData.ladders);
+  }
 
   state = 'PLAYING';
 }
@@ -234,7 +240,7 @@ function gameLoop(time) {
 
   if (state === 'PLAYING') {
     // 1. Update Player position and physics collisions
-    updatePlayerPhysics(player, dt, obstacles);
+    updatePlayerPhysics(player, dt, obstacles, ladders);
 
     // 2. Align Camera at eye height
     camera.position.set(
