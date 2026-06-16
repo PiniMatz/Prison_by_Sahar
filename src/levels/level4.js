@@ -345,6 +345,9 @@ export function loadLevel4(scene, obstacles, interactiveObjects) {
           cockpitHousing.material.color.setHex(0x1f2937);
           armL.material.color.setHex(0x1f2937);
           armR.material.color.setHex(0x1f2937);
+          gBody.material.color.setHex(0x1e3a8a);
+          gHead.material.color.setHex(0xffdbac);
+          gHat.material.color.setHex(0x0f172a);
         }
       }
 

@@ -241,8 +241,11 @@ function loadLevel(levelNum) {
     scene.fog.density = 0.05;
   } else if (levelNum === 4) {
     levelData = loadLevel4(scene, obstacles, interactiveObjects);
-    scene.fog.density = 0.03;
+    scene.fog.density = 0.0; // Disable fog for maximum visibility in Level 4
   }
+
+  // Ensure the camera is added to the scene (since clearing the scene in the level loader removes it)
+  scene.add(camera);
 
   // Position Player
   player.position.set(
