@@ -3,7 +3,7 @@ import { AABB, checkOverlap, getPlayerBox } from '../physics.js';
 import { 
   createMetalPlateTexture, 
   createConcreteFloorTexture 
-} from '../textures';
+} from '../textures.js';
 
 export function loadLevel4(scene, obstacles, interactiveObjects) {
   // Clear scene
@@ -46,6 +46,12 @@ export function loadLevel4(scene, obstacles, interactiveObjects) {
     transparent: true,
     opacity: 0.4,
     roughness: 0.1,
+    metalness: 0.9
+  });
+
+  const metalMat = new THREE.MeshStandardMaterial({
+    color: 0x9ca3af,
+    roughness: 0.2,
     metalness: 0.9
   });
 
