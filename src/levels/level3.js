@@ -246,8 +246,8 @@ export function loadLevel3(scene, obstacles, interactiveObjects) {
   interactiveObjects.push(interactiveExit);
 
   // 9. Lighting
-  // Ambient visibility (Brighter)
-  const ambient = new THREE.AmbientLight(0x444f66, 0.8);
+  // Bright ambient light to illuminate the large room
+  const ambient = new THREE.AmbientLight(0xcccccc, 1.4);
   scene.add(ambient);
 
   // Central prison fluorescent fixture
@@ -264,12 +264,21 @@ export function loadLevel3(scene, obstacles, interactiveObjects) {
   tube.position.set(0, height - 0.18, 0);
   scene.add(tube);
 
-  const roomLight = new THREE.PointLight(0xdbeafe, 3.2, 30);
+  // Central bright point light
+  const roomLight = new THREE.PointLight(0xdbeafe, 4.0, 35);
   roomLight.position.set(0, height - 0.3, 0);
   roomLight.castShadow = true;
   roomLight.shadow.mapSize.width = 1024;
   roomLight.shadow.mapSize.height = 1024;
   scene.add(roomLight);
+
+  // General ceiling directional floodlight
+  const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+  dirLight.position.set(0, height - 0.5, 0);
+  dirLight.castShadow = true;
+  dirLight.shadow.mapSize.width = 1024;
+  dirLight.shadow.mapSize.height = 1024;
+  scene.add(dirLight);
 
   // 10. Policeman Guard (Chasing AI)
   const guardGroup = new THREE.Group();
