@@ -445,14 +445,14 @@ body, html {
 .touch-controls {
   display: none;
   position: absolute;
-  bottom: 25px;
+  bottom: 15px; /* Moved lower to stay out of the screen center */
   left: 0;
   right: 0;
   pointer-events: none; /* Let touch dragging pass through empty space */
   z-index: 100;
   justify-content: space-between;
   align-items: flex-end;
-  padding: 0 40px;
+  padding: 0 20px; /* Moved closer to the edges */
   direction: ltr; /* Force left-to-right layout: D-pad on right, Actions on left */
 }
 
@@ -468,39 +468,29 @@ body.touch-device .touch-controls {
 }
 
 .touch-dpad {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-.touch-dpad-middle {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.touch-dpad-spacer {
-  width: 50px;
-  height: 50px;
+  display: grid;
+  grid-template-columns: repeat(3, 50px);
+  grid-template-rows: repeat(2, 50px);
+  gap: 6px;
+  justify-content: center;
 }
 
 .touch-actions {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 15px;
+  gap: 12px;
 }
 
 .touch-btn {
   pointer-events: auto; /* Enable touch clicks on the buttons */
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: rgba(22, 26, 35, 0.5);
+  width: 50px;
+  height: 50px;
+  border-radius: 8px; /* Rounded square like a keyboard key */
+  background: rgba(22, 26, 35, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.15);
   color: #fff;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -516,10 +506,10 @@ body.touch-device .touch-controls {
 }
 
 .touch-btn.action-large {
-  width: 110px;
-  height: 60px;
-  border-radius: 30px;
-  font-size: 1.1rem;
+  width: 100px;
+  height: 50px;
+  border-radius: 12px;
+  font-size: 1.0rem;
   font-weight: 700;
   background: rgba(56, 189, 248, 0.3);
   border-color: rgba(56, 189, 248, 0.5);
@@ -536,7 +526,7 @@ body.touch-device .touch-controls {
   background: rgba(239, 68, 68, 0.3);
   border-color: rgba(239, 68, 68, 0.5);
   font-weight: 700;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
 
 .touch-btn.action-small:active {
