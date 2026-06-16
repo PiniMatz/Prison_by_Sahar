@@ -453,6 +453,7 @@ body, html {
   justify-content: space-between;
   align-items: flex-end;
   padding: 0 40px;
+  direction: ltr; /* Force left-to-right layout: D-pad on right, Actions on left */
 }
 
 /* On coarse pointer devices (mobiles/tablets) OR if touch device is detected via JS, show touch controls */
