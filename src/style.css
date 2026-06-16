@@ -450,11 +450,15 @@ body, html {
   padding: 0 40px;
 }
 
-/* On coarse pointer devices (mobiles/tablets), show touch controls */
+/* On coarse pointer devices (mobiles/tablets) OR if touch device is detected via JS, show touch controls */
 @media (hover: none) and (pointer: coarse) {
   .touch-controls {
     display: flex;
   }
+}
+
+body.touch-device .touch-controls {
+  display: flex;
 }
 
 .touch-dpad {
@@ -532,4 +536,79 @@ body, html {
 .touch-btn.action-small:active {
   background: rgba(239, 68, 68, 0.6);
 }
+
+/* Responsive HUD scaling for mobile screens */
+@media (max-width: 768px), (hover: none) and (pointer: coarse) {
+  .hud-container {
+    padding: 10px !important;
+  }
+
+  .top-hud {
+    gap: 8px !important;
+    flex-wrap: nowrap !important;
+    align-items: flex-start !important;
+  }
+
+  .level-indicator, .objective-box {
+    padding: 6px 10px !important;
+    border-radius: 8px !important;
+    gap: 6px !important;
+  }
+
+  .hud-container .label {
+    font-size: 0.65rem !important;
+    letter-spacing: 0.5px !important;
+  }
+
+  .hud-container .value {
+    font-size: 0.8rem !important;
+  }
+
+  #level-num {
+    font-size: 0.95rem !important;
+  }
+
+  #player-hp {
+    font-size: 0.95rem !important;
+  }
+
+  /* Reticle scaling */
+  .reticle {
+    width: 6px !important;
+    height: 6px !important;
+    border-width: 1.5px !important;
+  }
+
+  /* Proximity warning HUD */
+  .warning-hud {
+    bottom: 95px !important;
+    font-size: 0.75rem !important;
+    padding: 5px 12px !important;
+  }
+
+  /* Interaction prompt */
+  .interaction-prompt {
+    font-size: 0.8rem !important;
+    padding: 6px 12px !important;
+    bottom: 90px !important;
+  }
+
+  /* Boss health bar scaling */
+  .boss-health-bar {
+    width: 70% !important;
+    margin-top: 8px !important;
+    padding: 6px 12px !important;
+    border-radius: 8px !important;
+  }
+
+  .boss-title {
+    font-size: 0.75rem !important;
+    margin-bottom: 4px !important;
+  }
+
+  .boss-hp-track {
+    height: 6px !important;
+  }
+}
+
 

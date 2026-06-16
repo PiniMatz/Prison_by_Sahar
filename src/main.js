@@ -38,6 +38,7 @@ const playerBullets = [];
 let gunViewModel = null;
 let recoilOffset = 0;
 let shootCooldown = 0;
+let isTouchDevice = false;
 
 // HTML UI Elements
 const uiStartMenu = document.getElementById('start-menu');
@@ -55,6 +56,11 @@ const btnRestart = document.getElementById('restart-btn');
 
 // Initialize WebGL Scene
 function initEngine() {
+  isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+  if (isTouchDevice) {
+    document.body.classList.add('touch-device');
+  }
+
   scene = new THREE.Scene();
   
   // Dark prison-like atmosphere fog
@@ -91,6 +97,7 @@ function initEngine() {
   let prevMouseY = 0;
 
   canvas.addEventListener('mousedown', (e) => {
+    if (isTouchDevice) return;
     isMouseDown = true;
     prevMouseX = e.clientX;
     prevMouseY = e.clientY;
@@ -100,11 +107,12 @@ function initEngine() {
   });
 
   window.addEventListener('mouseup', () => {
+    if (isTouchDevice) return;
     isMouseDown = false;
   });
 
   window.addEventListener('mousemove', (e) => {
-    if (state !== 'PLAYING') return;
+    if (state !== 'PLAYING' || isTouchDevice) return;
 
     const sensitivity = 0.0025;
 
