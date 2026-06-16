@@ -467,12 +467,38 @@ body.touch-device .touch-controls {
   display: flex;
 }
 
-.touch-dpad {
-  display: grid;
-  grid-template-columns: repeat(3, 50px);
-  grid-template-rows: repeat(2, 50px);
-  gap: 6px;
+.joystick-container {
+  pointer-events: auto; /* Enable touch dragging on the joystick */
+  width: 120px;
+  height: 120px;
+  display: flex;
   justify-content: center;
+  align-items: center;
+}
+
+.joystick-ring {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: rgba(22, 26, 35, 0.45);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), inset 0 0 10px rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(5px);
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.joystick-dot {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(56, 189, 248, 0.7);
+  border: 1px solid #38bdf8;
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+  position: absolute;
+  pointer-events: none; /* Let dragging register on the ring directly */
 }
 
 .touch-actions {

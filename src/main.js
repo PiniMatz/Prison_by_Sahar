@@ -29,7 +29,8 @@ const player = {
   jumpForce: 7.2,
   keys: {},
   hasGun: false, // equipped rifle state
-  hp: 100        // player hitpoints
+  hp: 100,       // player hitpoints
+  joystick: { x: 0, y: 0 } // virtual joystick input
 };
 window.playerObject = player; // expose for level4.js AI access
 
@@ -132,11 +133,75 @@ function initEngine() {
     player.pitch = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, player.pitch));
   });
 
-  // Mobile Touch Controls Bindings
-  bindTouchButton('touch-up', 'ArrowUp');
-  bindTouchButton('touch-down', 'ArrowDown');
-  bindTouchButton('touch-left', 'ArrowLeft');
-  bindTouchButton('touch-right', 'ArrowRight');
+  // Mobile Touch Joystick Controls
+  const joyRing = document.getElementById('joystick-ring');
+  const joyDot = document.getElementById('joystick-dot');
+  let activeTouchId = null;
+
+  if (joyRing && joyDot) {
+    const handleJoystickStart = (e) => {
+      e.preventDefault();
+      // Only track first touch inside joystick
+      if (activeTouchId !== null) return;
+      const touch = e.changedTouches[0];
+      activeTouchId = touch.identifier;
+      updateJoystickPosition(touch);
+    };
+
+    const handleJoystickMove = (e) => {
+      if (activeTouchId === null) return;
+      e.preventDefault(); // Prevent page scroll while playing
+      // Find the active touch
+      for (let i = 0; i < e.touches.length; i++) {
+        if (e.touches[i].identifier === activeTouchId) {
+          updateJoystickPosition(e.touches[i]);
+          break;
+        }
+      }
+    };
+
+    const handleJoystickEnd = (e) => {
+      if (activeTouchId === null) return;
+      // Check if active touch ended
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        if (e.changedTouches[i].identifier === activeTouchId) {
+          activeTouchId = null;
+          // Reset position
+          joyDot.style.transform = 'translate(0px, 0px)';
+          player.joystick.x = 0;
+          player.joystick.y = 0;
+          break;
+        }
+      }
+    };
+
+    const updateJoystickPosition = (touch) => {
+      const rect = joyRing.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      let dx = touch.clientX - centerX;
+      let dy = touch.clientY - centerY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      const maxRadius = rect.width / 2 - 10; // offset so dot stays within bounds nicely
+
+      if (distance > maxRadius) {
+        dx = (dx / distance) * maxRadius;
+        dy = (dy / distance) * maxRadius;
+      }
+
+      joyDot.style.transform = `translate(${dx}px, ${dy}px)`;
+
+      // Set normalized inputs
+      player.joystick.x = dx / maxRadius;
+      player.joystick.y = dy / maxRadius;
+    };
+
+    joyRing.addEventListener('touchstart', handleJoystickStart);
+    window.addEventListener('touchmove', handleJoystickMove, { passive: false });
+    window.addEventListener('touchend', handleJoystickEnd);
+    window.addEventListener('touchcancel', handleJoystickEnd);
+  }
 
   // Custom action buttons for touch controls
   const btnAction = document.getElementById('touch-action');
@@ -168,35 +233,60 @@ function initEngine() {
   }
 
   // Touch look-around (swipe to look)
-  let isTouching = false;
+  let activeLookTouchId = null;
   let prevTouchX = 0;
   let prevTouchY = 0;
   const touchSensitivity = 0.0035;
 
   canvas.addEventListener('touchstart', (e) => {
-    if (e.target === canvas) {
-      isTouching = true;
-      prevTouchX = e.touches[0].clientX;
-      prevTouchY = e.touches[0].clientY;
+    if (activeLookTouchId !== null) return;
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      const touch = e.changedTouches[i];
+      if (touch.target === canvas) {
+        activeLookTouchId = touch.identifier;
+        prevTouchX = touch.clientX;
+        prevTouchY = touch.clientY;
+        break;
+      }
     }
   }, { passive: true });
 
   canvas.addEventListener('touchmove', (e) => {
-    if (!isTouching || state !== 'PLAYING') return;
+    if (activeLookTouchId === null || state !== 'PLAYING') return;
 
-    const deltaX = e.touches[0].clientX - prevTouchX;
-    const deltaY = e.touches[0].clientY - prevTouchY;
+    let activeTouch = null;
+    for (let i = 0; i < e.touches.length; i++) {
+      if (e.touches[i].identifier === activeLookTouchId) {
+        activeTouch = e.touches[i];
+        break;
+      }
+    }
+
+    if (!activeTouch) return;
+
+    const deltaX = activeTouch.clientX - prevTouchX;
+    const deltaY = activeTouch.clientY - prevTouchY;
 
     player.yaw -= deltaX * touchSensitivity;
     player.pitch -= deltaY * touchSensitivity;
     player.pitch = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, player.pitch));
 
-    prevTouchX = e.touches[0].clientX;
-    prevTouchY = e.touches[0].clientY;
+    prevTouchX = activeTouch.clientX;
+    prevTouchY = activeTouch.clientY;
   }, { passive: true });
 
-  canvas.addEventListener('touchend', () => { isTouching = false; });
-  canvas.addEventListener('touchcancel', () => { isTouching = false; });
+  const handleLookEnd = (e) => {
+    if (activeLookTouchId === null) return;
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      if (e.changedTouches[i].identifier === activeLookTouchId) {
+        activeLookTouchId = null;
+        break;
+      }
+    }
+  };
+
+  canvas.addEventListener('touchend', handleLookEnd);
+  canvas.addEventListener('touchcancel', handleLookEnd);
 
   // Enable Viewmodel rendering (attach camera to scene and gun to camera)
   scene.add(camera);

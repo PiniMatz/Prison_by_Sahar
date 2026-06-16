@@ -55,26 +55,40 @@ export function updatePlayerPhysics(player, dt, obstacles, ladders = [], gravity
     }
   }
 
-  // Calculate movement direction based on key inputs
+  // Calculate movement direction based on key inputs or virtual joystick
   let moveX = 0;
   let moveZ = 0;
 
-  if (player.keys['ArrowUp']) {
-    moveX += -Math.sin(player.yaw) * player.speed;
-    moveZ += -Math.cos(player.yaw) * player.speed;
-  }
-  if (player.keys['ArrowDown']) {
-    moveX += Math.sin(player.yaw) * player.speed;
-    moveZ += Math.cos(player.yaw) * player.speed;
+  const joystick = player.joystick || { x: 0, y: 0 };
+
+  if (joystick.y !== 0) {
+    // y is negative for forward (dragged up) and positive for backward (dragged down)
+    const speedFactor = -joystick.y; // positive for forward, negative for backward
+    moveX += -Math.sin(player.yaw) * player.speed * speedFactor;
+    moveZ += -Math.cos(player.yaw) * player.speed * speedFactor;
+  } else {
+    if (player.keys['ArrowUp']) {
+      moveX += -Math.sin(player.yaw) * player.speed;
+      moveZ += -Math.cos(player.yaw) * player.speed;
+    }
+    if (player.keys['ArrowDown']) {
+      moveX += Math.sin(player.yaw) * player.speed;
+      moveZ += Math.cos(player.yaw) * player.speed;
+    }
   }
 
   // Yaw Rotation (turning head/body left and right)
   const turnSpeed = 2.0; // Rads per sec
-  if (player.keys['ArrowLeft']) {
-    player.yaw += turnSpeed * dt;
-  }
-  if (player.keys['ArrowRight']) {
-    player.yaw -= turnSpeed * dt;
+  if (joystick.x !== 0) {
+    // x is positive for right (clockwise rotation) and negative for left (counter-clockwise)
+    player.yaw -= joystick.x * turnSpeed * dt;
+  } else {
+    if (player.keys['ArrowLeft']) {
+      player.yaw += turnSpeed * dt;
+    }
+    if (player.keys['ArrowRight']) {
+      player.yaw -= turnSpeed * dt;
+    }
   }
 
   // Jump control (only if player doesn't have a gun)
