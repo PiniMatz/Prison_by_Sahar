@@ -77,8 +77,8 @@ export function updatePlayerPhysics(player, dt, obstacles, ladders = [], gravity
     player.yaw -= turnSpeed * dt;
   }
 
-  // Jump control
-  if (player.keys[' '] && player.isGrounded) {
+  // Jump control (only if player doesn't have a gun)
+  if (player.keys[' '] && player.isGrounded && !player.hasGun) {
     player.velocityY = player.jumpForce;
     player.isGrounded = false;
   }

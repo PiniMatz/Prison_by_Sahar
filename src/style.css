@@ -435,3 +435,101 @@ body, html {
     box-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
   }
 }
+
+/* Touch Controls for Mobile/Tablets */
+.touch-controls {
+  display: none;
+  position: absolute;
+  bottom: 25px;
+  left: 0;
+  right: 0;
+  pointer-events: none; /* Let touch dragging pass through empty space */
+  z-index: 100;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0 40px;
+}
+
+/* On coarse pointer devices (mobiles/tablets), show touch controls */
+@media (hover: none) and (pointer: coarse) {
+  .touch-controls {
+    display: flex;
+  }
+}
+
+.touch-dpad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.touch-dpad-middle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.touch-dpad-spacer {
+  width: 50px;
+  height: 50px;
+}
+
+.touch-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 15px;
+}
+
+.touch-btn {
+  pointer-events: auto; /* Enable touch clicks on the buttons */
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(22, 26, 35, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: background 0.1s, transform 0.1s;
+}
+
+.touch-btn:active {
+  background: rgba(56, 189, 248, 0.4);
+  border-color: #38bdf8;
+  transform: scale(0.9);
+}
+
+.touch-btn.action-large {
+  width: 110px;
+  height: 60px;
+  border-radius: 30px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  background: rgba(56, 189, 248, 0.3);
+  border-color: rgba(56, 189, 248, 0.5);
+}
+
+.touch-btn.action-large:active {
+  background: rgba(56, 189, 248, 0.6);
+  border-color: #38bdf8;
+}
+
+.touch-btn.action-small {
+  width: 50px;
+  height: 50px;
+  background: rgba(239, 68, 68, 0.3);
+  border-color: rgba(239, 68, 68, 0.5);
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.touch-btn.action-small:active {
+  background: rgba(239, 68, 68, 0.6);
+}
+

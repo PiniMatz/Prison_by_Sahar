@@ -181,8 +181,12 @@ export function loadLevel4(scene, obstacles, interactiveObjects) {
       if (idx !== -1) interactiveObjects.splice(idx, 1);
 
       // Update instructions
-      document.getElementById('objective-text').innerText = "הרובה בידיך! קליק שמאלי בעכבר כדי לירות. חסל את רובוט השוטר!";
+      document.getElementById('objective-text').innerText = "הרובה בידיך! לחץ על מקש הרווח (Space) או כפתור 'ירייה' כדי לירות. חסל את רובוט השוטר!";
       document.getElementById('objective-text').style.color = '#38bdf8';
+
+      // Update touch action button label
+      const btnActionLabel = document.getElementById('touch-action');
+      if (btnActionLabel) btnActionLabel.innerText = "ירייה";
     },
     promptMessage: "אסוף את רובה הלייזר (E)"
   };

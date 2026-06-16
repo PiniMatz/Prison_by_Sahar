@@ -37,6 +37,7 @@ window.playerObject = player; // expose for level4.js AI access
 const playerBullets = [];
 let gunViewModel = null;
 let recoilOffset = 0;
+let shootCooldown = 0;
 
 // HTML UI Elements
 const uiStartMenu = document.getElementById('start-menu');
@@ -95,11 +96,6 @@ function initEngine() {
     prevMouseY = e.clientY;
     if (state === 'PLAYING') {
       canvas.requestPointerLock();
-      
-      // Fire gun on Left Click
-      if (e.button === 0) {
-        shootWeapon();
-      }
     }
   });
 
@@ -128,9 +124,92 @@ function initEngine() {
     player.pitch = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, player.pitch));
   });
 
+  // Mobile Touch Controls Bindings
+  bindTouchButton('touch-up', 'ArrowUp');
+  bindTouchButton('touch-down', 'ArrowDown');
+  bindTouchButton('touch-left', 'ArrowLeft');
+  bindTouchButton('touch-right', 'ArrowRight');
+
+  // Custom action buttons for touch controls
+  const btnAction = document.getElementById('touch-action');
+  if (btnAction) {
+    btnAction.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      if (player.hasGun) {
+        shootWeapon();
+      } else {
+        player.keys[' '] = true;
+      }
+    });
+    btnAction.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      player.keys[' '] = false;
+    });
+    btnAction.addEventListener('touchcancel', (e) => {
+      e.preventDefault();
+      player.keys[' '] = false;
+    });
+  }
+
+  const btnInteract = document.getElementById('touch-interact');
+  if (btnInteract) {
+    btnInteract.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      handleInteraction();
+    });
+  }
+
+  // Touch look-around (swipe to look)
+  let isTouching = false;
+  let prevTouchX = 0;
+  let prevTouchY = 0;
+  const touchSensitivity = 0.0035;
+
+  canvas.addEventListener('touchstart', (e) => {
+    if (e.target === canvas) {
+      isTouching = true;
+      prevTouchX = e.touches[0].clientX;
+      prevTouchY = e.touches[0].clientY;
+    }
+  }, { passive: true });
+
+  canvas.addEventListener('touchmove', (e) => {
+    if (!isTouching || state !== 'PLAYING') return;
+
+    const deltaX = e.touches[0].clientX - prevTouchX;
+    const deltaY = e.touches[0].clientY - prevTouchY;
+
+    player.yaw -= deltaX * touchSensitivity;
+    player.pitch -= deltaY * touchSensitivity;
+    player.pitch = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, player.pitch));
+
+    prevTouchX = e.touches[0].clientX;
+    prevTouchY = e.touches[0].clientY;
+  }, { passive: true });
+
+  canvas.addEventListener('touchend', () => { isTouching = false; });
+  canvas.addEventListener('touchcancel', () => { isTouching = false; });
+
   // Enable Viewmodel rendering (attach camera to scene and gun to camera)
   scene.add(camera);
   createGunViewModel();
+}
+
+function bindTouchButton(id, keyName) {
+  const btn = document.getElementById(id);
+  if (!btn) return;
+  btn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    player.keys[keyName] = true;
+  });
+  btn.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    player.keys[keyName] = false;
+  });
+  btn.addEventListener('touchcancel', (e) => {
+    e.preventDefault();
+    player.keys[keyName] = false;
+  });
 }
 
 function onWindowResize() {
@@ -149,6 +228,11 @@ function onKeyDown(e) {
   if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') player.keys['ArrowDown'] = true;
   if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') player.keys['ArrowLeft'] = true;
   if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') player.keys['ArrowRight'] = true;
+
+  // Shoot weapon with Space if player has the gun
+  if (e.key === ' ' && player.hasGun) {
+    shootWeapon();
+  }
 
   // Interaction Key (E / e / ק)
   // Checking e.code === 'KeyE' handles QWERTY physical key regardless of layout (e.g. Hebrew)
@@ -224,6 +308,9 @@ function loadLevel(levelNum) {
   player.hp = 100;
   const hpDisplay = document.getElementById('player-hp');
   if (hpDisplay) hpDisplay.innerText = 100;
+
+  const btnActionLabel = document.getElementById('touch-action');
+  if (btnActionLabel) btnActionLabel.innerText = "קפיצה";
 
   // Hide boss health bar by default
   const bossBar = document.getElementById('boss-health-bar');
@@ -315,7 +402,8 @@ function createGunViewModel() {
 
 // Shoot a neon laser bullet
 function shootWeapon() {
-  if (state !== 'PLAYING' || !player.hasGun) return;
+  if (state !== 'PLAYING' || !player.hasGun || shootCooldown > 0) return;
+  shootCooldown = 0.3; // 300ms fire rate cooldown
 
   const bulletGeo = new THREE.SphereGeometry(0.04, 6, 6);
   const bulletMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
@@ -392,6 +480,11 @@ function gameLoop(time) {
   if (dt > 0.1) dt = 0.1;
 
   if (state === 'PLAYING') {
+    // Update shoot cooldown
+    if (shootCooldown > 0) {
+      shootCooldown -= dt;
+    }
+
     // 1. Update Player position and physics collisions
     updatePlayerPhysics(player, dt, obstacles, ladders);
 
